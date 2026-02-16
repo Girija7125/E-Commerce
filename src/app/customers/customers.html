@@ -1,0 +1,28 @@
+<div class="card mt-3">
+    <div class="card-header text-white">
+        <h5>Customers</h5>
+    </div>
+        <div class="card-body p-0 ">
+            
+            <table class="table ">
+                <thead class="table-light">
+                    <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     @for(customer of customers; track customer.id){
+                    <tr> 
+                        <td>{{customer.name}}</td>
+                        <td>{{customer.email}}</td>
+                        <td>{{customer.joined}}</td>
+                    </tr>   
+                        }
+                    
+                </tbody>
+            </table>
+        </div>
+    
+</div>

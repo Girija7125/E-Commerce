@@ -1,0 +1,42 @@
+<header>
+    <div class="container-fluid">
+        <div class="row mt-0 p-0 g-0">
+            <div class="d-flex gap-3 p-right justify-content-end">
+                @for(module of modules; track module.name){
+                <div class="card d-flex flex-row align-items-center  p-2 gap-2">
+                    <i [class]="module.icon"></i>
+                    <div>
+                        <div class="fw-bold">{{module.name}}</div>
+                        <small class="text-muted">{{module.subtitles}}</small>
+                    </div>
+                </div>
+                }
+            </div>
+
+        </div>
+        <div class="row pt-3">
+            <div class="col-12 d-flex bg-color justify-content-between   p-2 text-white">
+                <h5 class="mx-auto">Simple E-Commerce Dashboard</h5>
+                <div class="dropdown">
+                    <button class="btn  text-decoration-none text-white p-0 " (click)="toggleDropdown()">
+
+                        <small class="px-left">Hello,Admin
+                            <span class="dropdown-arrow">
+                                <i class="fa-solid fa-caret-down "></i></span>
+                        </small>
+                    </button>
+                    <div class="dropdown-menu " [class.show]="isDropdownOpen">
+                        <a class="dropdown-item" href="#" (click)="onProfile(); $event.preventDefault()">
+                            <span class="me-2"><i class="fa-solid fa-user"></i></span> Profile
+                        </a>
+                        <a class="dropdown-item" href="#" (click)="onSettings(); $event.preventDefault()">
+                            <span class="me-2"><i class="fa-solid fa-gear"></i></span> Settings
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</header>

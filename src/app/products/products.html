@@ -1,0 +1,39 @@
+<div class="card m-0 p-0">
+    <div class="card-header text-white">
+        <h5>ProductList</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+        <table class="table   p-3">
+            <thead class="table-light">
+            <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for(product of products; track product.id ){
+                    <tr>
+                    <td>{{product.name}}</td>
+                    <td>${{product.price }}</td>
+                    <td>
+                        <span [ngClass]="product.stockColor" class="fw-bold">
+                            {{ product.stock }}</span>
+                        </td>
+                </tr>
+                    
+                }  
+            </tbody>
+        </table>
+        </div>
+        <div class="d-flex justify-content-center">
+    <button 
+      (click)="viewDetails()" 
+      class="btn btn-primary btn-sm  w-50  mb-3">
+      <b>View Details</b>
+    </button>
+    </div>
+        
+    </div>
+</div>

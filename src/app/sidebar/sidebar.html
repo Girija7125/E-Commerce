@@ -1,0 +1,15 @@
+<div class="sidebar min-vh-100">
+   <ul class="nav flex-column mb-auto p-2">
+    @for (item of menuItems; track item.label) {
+      <li class="nav-item">
+        <a 
+        [routerLink]="item.path" 
+        routerLinkActive="active"
+        class="nav-link text-white d-flex align-items-center gap-2">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    }
+    </ul>
+</div>

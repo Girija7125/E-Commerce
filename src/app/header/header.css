@@ -1,0 +1,22 @@
+header{
+  padding-top: 10px;
+  background-color: #1E3A5F;
+}
+.card {
+  transition: transform 0.2s;
+  width: 200px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.bg-color{
+  background-color: #34495E;
+}
+.p-right{
+  padding-right: 150px;
+}
+.px-left{
+  padding-right: 100px;
+}

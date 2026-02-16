@@ -1,0 +1,8 @@
+.container-fluid{
+    width: 1000px;
+    margin-left: 2px;
+    border-radius: 5px;
+    padding: 5px;
+    /* height: 100vh; */
+    border: 2px solid rgb(216, 215, 215);
+}
