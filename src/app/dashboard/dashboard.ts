@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { Authentication } from '../authentication/authentication';
+import { Authentication } from '../Authentication/authentication';
 import { Products } from '../products/products';
 import { Orders } from '../orders/orders';
 import { CommonModule } from '@angular/common';
 import { Customers } from '../customers/customers';
+import { AuthService } from '../services/auth';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,5 +13,6 @@ import { Customers } from '../customers/customers';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
-
+  
+  constructor(public auth: AuthService) {}
 }

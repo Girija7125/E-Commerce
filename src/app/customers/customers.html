@@ -1,28 +1,186 @@
-<div class="card mt-3">
-    <div class="card-header text-white">
-        <h5>Customers</h5>
-    </div>
-        <div class="card-body p-0 ">
-            
-            <table class="table ">
-                <thead class="table-light">
-                    <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Joined</th>
-                    </tr>
-                </thead>
-                <tbody>
-                     @for(customer of customers; track customer.id){
-                    <tr> 
-                        <td>{{customer.name}}</td>
-                        <td>{{customer.email}}</td>
-                        <td>{{customer.joined}}</td>
-                    </tr>   
-                        }
-                    
-                </tbody>
-            </table>
+<div class="card mt-0">
+  <div class="card-header text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Customers</h5>
+  </div>
+  <div class="card-body p-0">
+
+    @if(limit === 0) {
+      <div class="d-flex justify-content-end p-2">
+        @if(canAdd) {
+          <button class="btn btn-primary btn-sm" (click)="openAddModal(customerModal)">
+            Add Customer
+          </button>
+        }
+      </div>
+
+      
+      <div class="d-flex gap-2 px-3 pb-2 flex-wrap align-items-end">
+        
+        <div>
+          <label class="form-label mb-1 small">Search</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="searchQuery"
+            placeholder="Search by customer name" style="width:300px" />
         </div>
+        
+        <div>
+          <label class="form-label mb-1 small">From Date</label>
+          <div class="input-group input-group-sm" style="width:200px">
+            <input class="form-control form-control-sm" placeholder="yyyy-mm-dd" [(ngModel)]="fromDate" ngbDatepicker
+              #fromPicker="ngbDatepicker" />
+            <button class="btn btn-outline-secondary btn-sm" (click)="fromPicker.toggle()" type="button">
+              <i class="bi bi-calendar"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div>
+          <label class="form-label mb-1 small">To Date</label>
+          <div class="input-group input-group-sm" style="width:200px">
+            <input class="form-control form-control-sm" placeholder="yyyy-mm-dd" [(ngModel)]="toDate" ngbDatepicker
+              #toPicker="ngbDatepicker" navigation="select" />
+            <button class="btn btn-outline-secondary btn-sm" (click)="toPicker.toggle()" type="button">
+              <i class="bi bi-calendar"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="d-flex flex-column">
+          <label class="form-label">Status</label>
+          <select class="form-select form-select-sm" [(ngModel)]="selectedActive">
+            <option value="">All</option>
+            <option value="Active">Active</option>
+            <option value="In Active">In Active</option>
+          </select>
+        </div>
+        
+        <div class="d-flex gap-2 align-items-end">
+          <button class="btn btn-primary btn-sm" (click)="applySearchAndFilter()">Search</button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">Reset</button>
+        </div>
+      </div>
+    }
+
+    <ng-template #customerModal let-modal>
+      <div class="modal-header">
+        <h6 class="modal-title">{{ editingId ? 'Edit Customer' : 'Add New Customer' }}</h6>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2">
+          <label>Name</label>
+          <input type="text" class="form-control" [(ngModel)]="customerForm.name" />
+        </div>
+        <div class="mb-2">
+          <label>Email</label>
+          <input type="email" class="form-control" [(ngModel)]="customerForm.email" />
+        </div>
+        <div class="mb-2">
+          <label>Joined Date</label>
+          <div class="input-group">
+            <input class="form-control" [(ngModel)]="customerForm.joined" ngbDatepicker
+              #customerDatePicker="ngbDatepicker" />
+            <button class="btn btn-outline-secondary" (click)="customerDatePicker.toggle()" type="button">
+              <i class="bi bi-calendar"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mb-2">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="customerForm.active">
+            <option value="">Select status</option>
+            <option value="Active">Active</option>
+            <option value="In Active">In Active</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" (click)="saveCustomer(); modal.close()">
+          {{ editingId ? 'Update' : 'Save' }}
+        </button>
+        <button class="btn btn-secondary btn-sm" (click)="modal.dismiss()">Cancel</button>
+      </div>
+    </ng-template>
+
     
+    @if(loading) {
+      <div class="d-flex justify-content-center align-items-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span class="ms-2 text-muted">Loading customers...</span>
+      </div>
+    }
+
+    
+    @if(!loading) {
+      <table class="table">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Joined</th>
+            <th>Status</th>
+            @if(limit === 0 && showActions) {
+              <th>Actions</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for(customer of customers; track customer._id) {
+          <tr>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.joined }}</td>
+            <td>
+              <span [ngClass]="customer.color" class="fw-bold">{{ customer.active }}</span>
+            </td>
+            @if(limit === 0 && showActions) {
+              <td>
+                @if(canEdit) {
+                  <button class="btn btn-warning btn-sm me-1"  (click)="openEditModal(customerModal, customer)">
+                    Edit
+                  </button>
+                }
+                @if(canDelete) {
+                  <button class="btn btn-danger btn-sm" (click)="deleteCustomer(customer._id)">Delete</button>
+                }
+              </td>
+              
+            }
+          </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    
+    @if(limit === 0 && totalPages > 1) {
+      <div class="d-flex justify-content-between align-items-center px-3 py-2">
+        <small class="text-muted">{{ currentPage }} of {{ totalPages }}</small>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm" (click)="goToPage(currentPage - 1)"
+            [disabled]="currentPage === 1">Previous</button>
+          <button class="btn btn-outline-primary btn-sm" (click)="goToPage(currentPage + 1)"
+            [disabled]="currentPage === totalPages">Next</button>
+        </div>
+      </div>
+    }
+
+    
+    @if(showDeleteModal) {
+      <div class="modal-backdrop-custom">
+        <div class="custom-modal">
+          <div class="modal-header bg-danger text-white">
+            <h6 class="mb-0">Confirm Delete</h6>
+          </div>
+          <div class="modal-body p-3">Are you sure you want to delete this customer?</div>
+          <div class="modal-footer d-flex justify-content-end gap-2 p-3">
+            <button class="btn btn-secondary btn-sm" (click)="cancelDelete()">Cancel</button>
+            <button class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
 </div>

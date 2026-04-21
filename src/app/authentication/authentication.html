@@ -1,27 +1,209 @@
-<div class="card">
-    <div class="card-header text-white">
-        <h5>Authentication</h5>
+<div [class]="limit === 0 ? 'login-fullscreen' : 'login-small'">
+  <div class="card h-100">
+
+    <div class="card-header text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Authentication</h5>
     </div>
-    <div class="card-body">
-        <h6>Login </h6>
-        <hr class="my-1">
 
-        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <div [class]="limit === 0 ? 'card-body d-flex flex-column justify-content-center' : 'card-body'">
 
-            <label class="form-label">Email</label>
-            <input type="email" formControlName="email" class="form-control" placeholder="Enter Your Email">
-            @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
-            <div class="text-danger">A valid email is required.</div>
+      @if(auth.isLoggedIn() && limit === 1) {
+      <div class="alert alert-success py-2 mb-3">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        You are already logged in!
+      </div>
+      }
+
+      @if(!auth.isLoggedIn() && !showForgotPassword && !showResetPassword) {
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="activeTab === 'login'" (click)="switchTab('login')">Login</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="activeTab === 'register'"
+            (click)="switchTab('register')">Register</button>
+        </li>
+      </ul>
+      }
+
+
+      @if(showForgotPassword) {
+      <h6>Forgot Password</h6>
+      <hr class="my-1">
+
+      @if(forgotPasswordMessage) {
+      <div class="alert alert-info py-2 mt-2">{{ forgotPasswordMessage }}</div>
+      }
+
+      <form [formGroup]="forgotForm" (ngSubmit)="onForgotPassword()">
+        <label class="form-label">Email</label>
+        <input type="email" formControlName="email" class="form-control" placeholder="Enter your email" />
+        @if(forgotForm.get('email')?.touched && forgotForm.get('email')?.invalid) {
+        <div class="text-danger">A valid email is required.</div>
+        }
+
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <button type="submit" class="btn btn-primary w-50" [disabled]="forgotPasswordLoading">
+            @if(forgotPasswordLoading) {
+            <span class="spinner-border spinner-border-sm me-1"></span> Sending...
+            } @else {
+            Send Reset Email
             }
-            <label class="form-label">Password</label>
-            <input type="password" formControlName="password" class="form-control" placeholder="Enter Your password">
-            @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
-            <div class="text-danger">Password must be at least 6 characters.</div>
-            }
-            <div class="d-flex justify-content-center ">
-                <button type="submit" class="btn btn-primary mt-3  w-50">Login</button>
-            </div>
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="backToLogin()">Back to Login</button>
+        </div>
+      </form>
+      }
 
-        </form>
+
+      @if(showResetPassword) {
+      <h6>Reset Password</h6>
+      <hr class="my-1">
+
+      @if(resetPasswordMessage) {
+      <div class="alert alert-info py-2 mt-2">{{ resetPasswordMessage }}</div>
+      }
+
+      <form [formGroup]="resetForm" (ngSubmit)="onResetPassword()">
+        <label class="form-label">Reset Token</label>
+        <input type="text" formControlName="token" class="form-control" placeholder="Enter the token" />
+        @if(resetForm.get('token')?.touched && resetForm.get('token')?.invalid) {
+        <div class="text-danger">Token is required.</div>
+        }
+
+        <label class="form-label mt-2">New Password</label>
+        <input type="password" formControlName="newPassword" class="form-control" placeholder="At least 8 characters" />
+        @if(resetForm.get('newPassword')?.touched && resetForm.get('newPassword')?.invalid) {
+        <div class="text-danger">Password must be at least 8 characters.</div>
+        }
+
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <button type="submit" class="btn btn-primary w-50" [disabled]="resetPasswordLoading">
+            @if(resetPasswordLoading) {
+            <span class="spinner-border spinner-border-sm me-1"></span> Resetting...
+            } @else {
+            Reset Password
+            }
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="backToLogin()">Cancel</button>
+        </div>
+
+
+        @if(generatedToken) {
+        <div class="alert alert-warning small mt-3">
+          Your token: <strong>{{ generatedToken }}</strong>
+        </div>
+        }
+      </form>
+      }
+
+      @if(activeTab === 'login' && !showForgotPassword && !showResetPassword) {
+      <h6>Login</h6>
+      <hr class="my-1">
+
+      @if(loginError) {
+      <div class="alert alert-danger py-2 mt-2">{{ loginError }}</div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <label class="form-label">Email</label>
+        <input type="email" formControlName="email" class="form-control" placeholder="Enter Your Email" />
+        @if(loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+        <div class="text-danger">A valid email is required.</div>
+        }
+
+        <label class="form-label mt-2">Password</label>
+
+        <div class="input-group">
+          <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password"
+            placeholder="Enter Your Password"
+            [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" />
+
+          <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+            <i class="bi" [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+          </button>
+        </div>
+        @if(loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+        <div class="text-danger">Password must be at least 6 characters.</div>
+        }
+
+        <div class="d-flex justify-content-center gap-2">
+          <button type="submit" class="btn btn-primary mt-3 w-50" [disabled]="loginLoading || auth.isLoggedIn()">
+            @if(loginLoading) {
+            <span class="spinner-border spinner-border-sm me-1"></span> Signing in...
+            } @else if(auth.isLoggedIn()) {
+            <i class="fa-solid fa-lock me-1"></i> Logged In
+            } @else {
+            Login
+            }
+          </button>
+
+          @if(auth.isLoggedIn() && limit === 1) {
+          <button type="button" class="btn btn-outline-danger mt-3" (click)="onLogout()">
+            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+          </button>
+          }
+        </div>
+
+
+        <div class="text-center mt-2">
+          <a *ngIf="!auth.isLoggedIn()" href="javascript:void(0)" (click)="showForgot()" class="text-muted small">Forgot
+            Password?</a>
+        </div>
+      </form>
+      }
+
+
+      @if(activeTab === 'register' && !showForgotPassword && !showResetPassword) {
+      <h6>Register</h6>
+      <hr class="my-1">
+
+      @if(registerError) {
+      <div class="alert alert-danger py-2 mt-2">{{ registerError }}</div>
+      }
+      @if(registerSuccess) {
+      <div class="alert alert-success py-2 mt-2">{{ registerSuccess }}</div>
+      }
+
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <label class="form-label">Name</label>
+        <input type="text" formControlName="name" class="form-control" placeholder="Enter Your Name" />
+        @if(registerForm.get('name')?.touched && registerForm.get('name')?.invalid) {
+        <div class="text-danger">Name must be at least 2 characters.</div>
+        }
+
+        <label class="form-label mt-2">Email</label>
+        <input type="email" formControlName="email" class="form-control" placeholder="Enter Your Email" />
+        @if(registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+        <div class="text-danger">A valid email is required.</div>
+        }
+
+        <label class="form-label mt-2">Password</label>
+
+        <input type="password" formControlName="password" class="form-control" placeholder="Enter Your Password" />
+        @if(registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+        <div class="text-danger">Password must be at least 8 characters.</div>
+        }
+
+        <label class="form-label mt-2">Confirm Password</label>
+        <input type="password" formControlName="confirmPassword" class="form-control"
+          placeholder="Confirm Your Password" />
+        @if(registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid) {
+        <div class="text-danger">Please confirm your password.</div>
+        }
+
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-success mt-3 w-50" [disabled]="registerLoading">
+            @if(registerLoading) {
+            <span class="spinner-border spinner-border-sm me-1"></span> Registering
+            } @else {
+            Register
+            }
+          </button>
+        </div>
+      </form>
+      }
+
     </div>
+  </div>
 </div>

@@ -1,0 +1,118 @@
+<div class="admin-wrapper">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold">
+      <i class="fa-solid fa-code me-2 text-primary"></i>Developer Management
+    </h5>
+    <button class="btn btn-sm btn-success" (click)="toggleCreateForm()">
+      @if(showCreateForm) {
+        <i class="fa-solid fa-xmark me-1"></i>Cancel
+      } @else {
+        <i class="fa-solid fa-plus me-1"></i>Create Developer
+      }
+    </button>
+  </div>
+
+  
+  @if(showCreateForm) {
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white py-2">
+        <small class="fw-bold">New Developer Account</small>
+      </div>
+      <div class="card-body p-3">
+        <form [formGroup]="createForm" (ngSubmit)="createDeveloper()">
+          <div class="row g-2 mb-3">
+            <div class="col-4">
+              <label class="form-label small fw-bold mb-1">Name</label>
+              <input type="text" formControlName="name" class="form-control form-control-sm">
+              @if(createForm.get('name')?.touched && createForm.get('name')?.invalid) {
+                <div class="text-danger small">Min 2 characters</div>
+              }
+            </div>
+            <div class="col-4">
+              <label class="form-label small fw-bold mb-1">Email</label>
+              <input type="email" formControlName="email" class="form-control form-control-sm">
+              @if(createForm.get('email')?.touched && createForm.get('email')?.invalid) {
+                <div class="text-danger small">Valid email required</div>
+              }
+            </div>
+            <div class="col-4">
+              <label class="form-label small fw-bold mb-1">Password</label>
+              <input type="password" formControlName="password" class="form-control form-control-sm">
+              @if(createForm.get('password')?.touched && createForm.get('password')?.invalid) {
+                <div class="text-danger small">Min 8 characters</div>
+              }
+            </div>
+          </div>
+
+          <label class="form-label small fw-bold mb-1">Permissions</label>
+          <table class="table table-bordered text-center mb-3">
+            <thead class="table-light">
+              <tr><th class="text-start">Section</th><th>View</th><th>Add</th><th>Edit</th><th>Delete</th></tr>
+            </thead>
+            <tbody>
+              @for(section of sections; track section) {
+                <tr>
+                  <td class="text-start fw-bold small">{{ capitalize(section) }}</td>
+                  @for(action of actions; track action) {
+                    <td><input type="checkbox" [(ngModel)]="newDevPermissions[section][action]" [ngModelOptions]="{standalone: true}"></td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success btn-sm" [disabled]="createLoading">
+              {{ createLoading ? 'Creating...' : 'Create Developer' }}
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="toggleCreateForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  
+  @if(loading) {
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+  } @else if(developers.length === 0) {
+    <div class="text-center text-muted py-5">No developers yet. Click "Create Developer" to add one.</div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Permissions</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(dev of developers; track dev._id) {
+            <tr>
+              <td class="fw-semibold">{{ dev.name }}</td>
+              <td>{{ dev.email }}</td>
+              <td>
+                <span class="badge bg-primary me-1" *ngFor="let section of sections">
+                  {{ capitalize(section) }}:
+                  {{ dev.permissions[section].view ? 'V' : '' }}
+                  {{ dev.permissions[section].add ? 'A' : '' }}
+                  {{ dev.permissions[section].edit ? 'E' : '' }}
+                  {{ dev.permissions[section].delete ? 'D' : '' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-warning me-1" (click)="editDeveloper(dev)"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-danger" (click)="deleteDeveloper(dev._id)"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if(successMessage) { <div class="alert alert-success mt-3">{{ successMessage }}</div> }
+  @if(errorMessage)   { <div class="alert alert-danger mt-3">{{ errorMessage }}</div> }
+</div>

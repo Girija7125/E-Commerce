@@ -1,0 +1,120 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="fa-solid fa-user-pen me-2"></i>Edit Developer
+  </h5>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="editForm" (ngSubmit)="save()">
+    
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Full Name</label>
+      <input type="text" class="form-control" formControlName="name" 
+             [class.is-invalid]="editForm.get('name')?.invalid && editForm.get('name')?.touched">
+      @if(editForm.get('name')?.invalid && editForm.get('name')?.touched) {
+        <div class="invalid-feedback">Name must be at least 2 characters.</div>
+      }
+    </div>
+
+    
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Email Address</label>
+      <input type="email" class="form-control" formControlName="email"
+             [class.is-invalid]="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+      @if(editForm.get('email')?.invalid && editForm.get('email')?.touched) {
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      }
+    </div>
+
+    
+  <div class="mb-3">
+  <label class="form-label fw-semibold">
+    New Password <span class="text-muted fw-normal">(optional)</span>
+  </label>
+
+  <div class="input-group">
+    <input
+      [type]="showPassword ? 'text' : 'password'"
+      class="form-control"
+      formControlName="password"
+      placeholder="Leave blank to keep current"
+      [class.is-invalid]="editForm.get('password')?.touched && editForm.get('password')?.invalid"
+    />
+
+    <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+      <i class="bi" [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+    </button>
+  </div>
+
+  @if(editForm.get('password')?.touched && editForm.get('password')?.invalid) {
+    <div class="invalid-feedback d-block">Password must be at least 8 characters.</div>
+  }
+</div>
+
+    
+  <div class="mb-3" *ngIf="editForm.get('password')?.value">
+  <label class="form-label fw-semibold">Confirm New Password</label>
+
+  <div class="input-group">
+    <input
+      [type]="showConfirmPassword ? 'text' : 'password'"
+      class="form-control"
+      formControlName="confirmPassword"
+      [class.is-invalid]="editForm.hasError('mismatch') && editForm.get('confirmPassword')?.touched"
+    />
+
+    <button type="button" class="btn btn-outline-secondary" (click)="toggleConfirmPassword()">
+      <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+    </button>
+  </div>
+
+  @if(editForm.hasError('mismatch') && editForm.get('confirmPassword')?.touched) {
+    <div class="invalid-feedback d-block">Passwords do not match.</div>
+  }
+</div>
+
+    
+    <h6 class="mt-4 mb-2 fw-bold">
+      Permissions
+    </h6>
+    <div class="table-responsive">
+      <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th class="text-start">Section</th>
+            <th>View</th>
+            <th>Add</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let section of sections">
+            <td class="text-start fw-semibold">{{ capitalize(section) }}</td>
+            <td *ngFor="let action of actions">
+              <div class="form-check d-flex justify-content-center">
+                <input class="form-check-input" type="checkbox"
+                       [(ngModel)]="editPermissions[section][action]"
+                       [ngModelOptions]="{standalone: true}">
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        @if(loading) {
+          Saving
+        } @else {
+          Save Changes
+        }
+      </button>
+    </div>
+  </form>
+</div>

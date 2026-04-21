@@ -1,36 +1,177 @@
-<div class="card m-0 ">
-    <div class="card-header text-white">
-        <h5>OrderList</h5>
-    </div>
-    <div class="card-body p-0">
-        <table class="table p-3">
-            <thead class="table-light">
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for(order of orders;track order.id){
-                <tr>
-                    <td>{{order.id}}</td>
-                    <td>{{order.customer}}</td>
-                    <td><span class="badge" [ngClass]="'bg-' + order.statusColor">
-                            {{ order.status }}
-                        </span></td>
-                </tr>
+<div class="card m-0">
+  <div class="card-header text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Order List</h5>
+  </div>
+  <div class="card-body p-0">
 
+    @if(limit === 0) {
+      <div class="d-flex justify-content-end p-3">
+        @if(canAdd) {
+          <button class="btn btn-success btn-sm" (click)="openAddForm(orderModal)">+ Add Order</button>
+        }
+      </div>
+
+      <div class="d-flex gap-2 px-3 pb-2 flex-wrap align-items-end">
+        <div>
+          <label class="form-label mb-1 small">Search Name & ID</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="searchQuery" style="width:300px" />
+        </div>
+        <div>
+          <label class="form-label mb-1 small">From Date</label>
+          <div class="input-group input-group-sm" style="width:200px">
+            <input class="form-control form-control-sm"
+                   [(ngModel)]="fromDate" ngbDatepicker #fromPicker="ngbDatepicker" />
+            <button class="btn btn-outline-secondary btn-sm" (click)="fromPicker.toggle()" type="button">
+              <i class="bi bi-calendar"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="form-label mb-1 small">To Date</label>
+          <div class="input-group input-group-sm" style="width:200px">
+            <input class="form-control form-control-sm"
+                   [(ngModel)]="toDate" ngbDatepicker #toPicker="ngbDatepicker" />
+            <button class="btn btn-outline-secondary btn-sm" (click)="toPicker.toggle()" type="button">
+              <i class="bi bi-calendar"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="form-label mb-1 small">Status</label>
+          <select class="form-control form-control-sm" [(ngModel)]="statusFilter">
+            <option value="">All</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div class="d-flex gap-2 align-items-end">
+          <button class="btn btn-primary btn-sm" (click)="searchOrders()">Search</button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">Reset</button>
+        </div>
+      </div>
+    }
+
+    @if(loading) {
+      <div class="d-flex justify-content-center align-items-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span class="ms-2 text-muted">Loading orders...</span>
+      </div>
+    }
+
+    @if(!loading) {
+      <table class="table p-3">
+        <thead class="table-light">
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Status</th>
+            @if(limit === 0) {
+              <th>Date Of Order</th>
+              @if(showActions) { <th>Actions</th> }
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for(order of displayOrders; track order._id) {
+            <tr>
+              <td>{{ order.orderId }}</td>
+              <td>{{ order.customer }}</td>
+              <td>
+                <span class="badge" [ngClass]="'bg-' + order.statusColor">{{ order.status }}</span>
+              </td>
+              @if(limit === 0) {
+                <td>{{ order.date }}</td>
+                @if(showActions) {
+                  <td>
+                    @if(canEdit) {
+                      <button class="btn btn-warning btn-sm me-1" (click)="openEditForm(order, orderModal)">Edit</button>
+                    }
+                    @if(canDelete) {
+                      <button class="btn btn-danger btn-sm" (click)="deleteOrder(order._id)">Delete</button>
+                    }
+                  </td>
                 }
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center">
-    <button 
-      (click)="viewOrder()" 
-      class="btn btn-primary text-white btn-sm w-50  mb-3">
-      <strong>View Order</strong>
-    </button>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if(limit === 0 && totalPages > 1) {
+        <div class="d-flex justify-content-between align-items-center px-3 py-2">
+          <small class="text-muted">Showing page {{ currentPage }} of {{ totalPages }} ({{ totalOrders }} results)</small>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary btn-sm" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+            <button class="btn btn-outline-primary btn-sm" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+          </div>
+        </div>
+      }
+
+      @if(showDeleteModal) {
+        <div class="modal-backdrop-custom">
+          <div class="custom-modal">
+            <div class="modal-header bg-danger text-white"><h6 class="mb-0">Confirm Delete</h6></div>
+            <div class="modal-body p-3">Are you sure you want to delete this order?</div>
+            <div class="modal-footer d-flex justify-content-end gap-2 p-3">
+              <button class="btn btn-secondary btn-sm" (click)="cancelDelete()">Cancel</button>
+              <button class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    @if(limit > 0) {
+      <div class="d-flex justify-content-center">
+        <button type="button" (click)="goToOrders()" class="btn button btn-primary text-white btn-sm w-50 mb-4">
+          <strong>View Order</strong>
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<ng-template #orderModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editingId ? 'Edit Order' : 'Add Order' }}</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="mb-2">
+      <label>OrderID</label>
+      <input type="text" class="form-control" [(ngModel)]="orderForm.orderId" />
     </div>
 
+    <div class="mb-2">
+      <label>Customer</label>
+      <input type="text" class="form-control" [(ngModel)]="orderForm.customer" />
     </div>
-</div>
+
+    <div class="mb-2">
+      <label>Date Of Order</label>
+      <div class="input-group">
+        <input class="form-control" [(ngModel)]="orderForm.date" ngbDatepicker #d="ngbDatepicker" />
+        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"><i class="bi bi-calendar"></i></button>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <label>Status</label>
+      <select class="form-control" [(ngModel)]="orderForm.status">
+        <option value="">Select</option>
+        <option value="Shipped">Shipped</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveOrder(); modal.close()">
+      {{ editingId ? 'Update' : 'Save' }}
+    </button>
+  </div>
+</ng-template>

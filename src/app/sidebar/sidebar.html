@@ -1,15 +1,55 @@
 <div class="sidebar min-vh-100">
-   <ul class="nav flex-column mb-auto p-2">
-    @for (item of menuItems; track item.label) {
+  <ul class="nav flex-column mb-auto p-2">
+
+  @if(authService.isAdmin()||authService.isUser()){
+    <li class="nav-item">
+      <a routerLink="/dashboard" routerLinkActive="active"
+         class="nav-link  d-flex align-items-center gap-2">
+        <i class="fa-solid fa-house fa-2x fs-2"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+  }
+
+    @if(authService.canView('products')) {
       <li class="nav-item">
-        <a 
-        [routerLink]="item.path" 
-        routerLinkActive="active"
-        class="nav-link text-white d-flex align-items-center gap-2">
-          <i [class]="item.icon"></i>
-          <span>{{ item.label }}</span>
+        <a routerLink="/products" routerLinkActive="active"
+           class="nav-link d-flex align-items-center gap-2">
+          <i class="fa-solid fa-box fa-2x fs-2"></i>
+          <span>Products</span>
         </a>
       </li>
     }
-    </ul>
+
+    @if(authService.canView('orders')) {
+      <li class="nav-item">
+        <a routerLink="/orders" routerLinkActive="active"
+           class="nav-link  d-flex align-items-center gap-2">
+          <i class="fa-solid fa-cart-shopping fa-2x fs-2"></i>
+          <span>Orders</span>
+        </a>
+      </li>
+    }
+
+    @if(authService.canView('customers')) {
+      <li class="nav-item">
+        <a routerLink="/customers" routerLinkActive="active"
+           class="nav-link  d-flex align-items-center gap-2">
+          <i class="fa-solid fa-user fa-2x fs-2"></i>
+          <span>Customers</span>
+        </a>
+      </li>
+    }
+
+    @if(authService.isAdmin()) {
+      <li class="nav-item mt-3">
+        <a routerLink="/admin" routerLinkActive="active"
+           class="nav-link  d-flex align-items-center gap-2">
+          <i class="fa-solid fa-shield fa-2x fs-2"></i>
+          <span>Admin Panel</span>
+        </a>
+      </li>
+    }
+
+  </ul>
 </div>

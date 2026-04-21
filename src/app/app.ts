@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component} from '@angular/core';
+import {  RouterOutlet } from '@angular/router';
 import { Header } from './header/header';
 import { Sidebar } from './sidebar/sidebar';
+import { AuthService } from './services/auth';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +11,5 @@ import { Sidebar } from './sidebar/sidebar';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('e-commerce');
+  constructor(public authService: AuthService) {}
 }

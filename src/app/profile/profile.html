@@ -1,0 +1,104 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-user-circle me-2"></i> My Profile
+          </h5>
+        </div>
+
+        <div class="card-body">
+        
+          <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+            {{ successMessage }}
+            <button type="button" class="btn-close" (click)="successMessage=''"></button>
+          </div>
+
+          <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage=''"></button>
+          </div>
+
+          <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+            <h6 class="border-bottom pb-2">Personal Information</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" formControlName="name"
+                     [class.is-invalid]="profileForm.get('name')?.touched && profileForm.get('name')?.invalid">
+              <div *ngIf="profileForm.get('name')?.touched && profileForm.get('name')?.invalid"
+                   class="invalid-feedback">
+                Minimum 2 characters required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" formControlName="email"
+                     [class.is-invalid]="profileForm.get('email')?.touched && profileForm.get('email')?.invalid">
+              <div *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.invalid"
+                   class="invalid-feedback">
+                Valid email address required
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="profileLoading">
+              <span *ngIf="profileLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ profileLoading ? 'Saving...' : 'Update Profile' }}
+            </button>
+
+          </form>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="mt-4">
+            <h6 class="border-bottom pb-2">Change Password</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Current Password</label>
+              <div class="input-group">
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="form-control"
+                       formControlName="currentPassword"
+                       [class.is-invalid]="passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.invalid">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="showPassword = !showPassword">
+                  <i class="fa" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                </button>
+                <div *ngIf="passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.invalid"
+                     class="invalid-feedback d-block">
+                  Minimum 8 characters required
+                </div>
+              </div>
+            </div>
+
+
+
+            <div class="mb-3">
+              <label class="form-label">New Password</label>
+              <div class="input-group">
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="form-control"
+                       formControlName="newPassword"
+                       [class.is-invalid]="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="showPassword = !showPassword">
+                  <i class="fa" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                </button>
+                <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid"
+                     class="invalid-feedback d-block">
+                  Minimum 8 characters required
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-secondary" [disabled]="passwordLoading">
+              <span *ngIf="passwordLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ passwordLoading ? 'Changing...' : 'Change Password' }}
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

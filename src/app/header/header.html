@@ -3,39 +3,101 @@
         <div class="row mt-0 p-0 g-0">
             <div class="d-flex gap-3 p-right justify-content-end">
                 @for(module of modules; track module.name){
-                <div class="card d-flex flex-row align-items-center  p-2 gap-2">
+                <div class="card d-flex flex-row align-items-center p-2 gap-2">
                     <i [class]="module.icon"></i>
                     <div>
-                        <div class="fw-bold">{{module.name}}</div>
-                        <small class="text-muted">{{module.subtitles}}</small>
+                        <div class="fw-bold ">{{module.name}}</div>
+                        <small class="text-muted ">{{module.subtitles}}</small>
                     </div>
                 </div>
                 }
             </div>
-
         </div>
-        <div class="row pt-3">
-            <div class="col-12 d-flex bg-color justify-content-between   p-2 text-white">
-                <h5 class="mx-auto">Simple E-Commerce Dashboard</h5>
-                <div class="dropdown">
-                    <button class="btn  text-decoration-none text-white p-0 " (click)="toggleDropdown()">
 
-                        <small class="px-left">Hello,Admin
-                            <span class="dropdown-arrow">
-                                <i class="fa-solid fa-caret-down "></i></span>
+        <div class="row pt-3">
+            <div class="col-12 d-flex justify-content-between p-2">
+                <h5 class="mx-auto">Simple E-Commerce Dashboard</h5>
+
+                <div class="dropdown">
+                    <button class="btn text-decoration-none p-0" (click)="toggleDropdown()">
+                        <small class="px-left d-flex align-items-center gap-2">
+
+                            <span class="dropdown-text">Hello, {{ (auth.user$ | async)?.name || 'User' }}</span>
+
+                            <span class="dropdown-arrow dropdown-text">
+                                <i class="fa-solid fa-caret-down"></i>
+                            </span>
                         </small>
                     </button>
-                    <div class="dropdown-menu " [class.show]="isDropdownOpen">
+
+                    <div class="dropdown-menu" [class.show]="isDropdownOpen">
+
+                        <div class="px-3 py-2 border-bottom">
+                            <div class="fw-bold">{{ (auth.user$ | async)?.name }}</div>
+                            <small class="text-muted">{{ (auth.user$ | async)?.email }}</small>
+                        </div>
+
+                        <hr class="dropdown-divider" />
+                        <a class="dropdown-item text-danger" href="#" (click)="onLogout(); $event.preventDefault()">
+                            <span class="me-2"><i class="fa-solid fa-right-from-bracket"></i></span> Logout
+                        </a>
                         <a class="dropdown-item" href="#" (click)="onProfile(); $event.preventDefault()">
                             <span class="me-2"><i class="fa-solid fa-user"></i></span> Profile
                         </a>
                         <a class="dropdown-item" href="#" (click)="onSettings(); $event.preventDefault()">
                             <span class="me-2"><i class="fa-solid fa-gear"></i></span> Settings
                         </a>
+                        <a class="dropdown-item" href="#" (click)="openThemeModal(); $event.preventDefault()">
+                            <span class="me-2"><i class="fa-solid fa-palette"></i></span> Theme
+                        </a>
                     </div>
-
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="themeModalOpen" class="theme-modal-backdrop" (click)="closeThemeModal()">
+        <div class="theme-modal" (click)="$event.stopPropagation()">
+            <div class="theme-modal-header d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Theme Settings</h6>
+                <button class="btn-close" type="button" aria-label="Close" (click)="closeThemeModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="theme-modal-body">
+                <div class="theme-field position-relative">
+                    <label class="theme-label">Header background</label>
+                    <input type="text" [(ngModel)]="theme.headerBg" class="form-control theme-input"
+                        (change)="onBgColorChange()" />
+                    <input type="color" [(ngModel)]="theme.headerBg" class="color-overlay"
+                        (change)="onBgColorChange()" />
+                </div>
+
+                <div class="theme-field position-relative">
+                    <label class="theme-label">Header text</label>
+                    <input type="text" [(ngModel)]="theme.headerText" class="form-control theme-input" />
+                    <input type="color" [(ngModel)]="theme.headerText" class="color-overlay" />
+                </div>
+
+
+
+                <div class="theme-field position-relative">
+                    <label class="theme-label">Sidebar background</label>
+                    <input type="text" [(ngModel)]="theme.sidebarBg" class="form-control theme-input"
+                        (change)="onSidebarBgChange()" />
+                    <input type="color" [(ngModel)]="theme.sidebarBg" class="color-overlay"
+                        (change)="onSidebarBgChange()" />
+                </div>
+                <div class="theme-field position-relative">
+                    <label class="theme-label">Sidebar text</label>
+                    <input type="text" class="form-control  theme-input" [(ngModel)]="theme.sidebarText" />
+                    <input type="color" [(ngModel)]="theme.sidebarText" class="color-overlay" />
+                </div>
+                <div class="theme-actions d-flex justify-content-end gap-2 mt-3">
+                    <button class="btn btn-secondary btn-sm" type="button" (click)="closeThemeModal()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" type="button" (click)="saveTheme(); closeThemeModal()">Apply
+                        Change</button>
+                </div>
             </div>
         </div>
     </div>
